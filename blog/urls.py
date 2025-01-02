@@ -7,6 +7,6 @@ urlpatterns = [
     #path('', views.index),
 
     #CBV
-    path('', views.PostList.as_view()),
-    path('<int:pk>/', views.PostDetail.as_view()),
+    path('', views.PostList.as_view(), name='post_list'),
+    path('<int:pk>/', views.PostDetail.as_view(), name='post_detail'),
 ]
