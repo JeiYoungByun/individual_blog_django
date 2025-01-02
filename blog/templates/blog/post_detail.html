@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{% static 'blog/bootstrap/bootstrap.min.css' %}" media="screen">
     <!-- Custom styles for this template -->
     <link rel="stylesheet" href="{% static 'blog/css/styles.css' %}" media="screen">
+    <script src="https://kit.fontawesome.com/fe79e35d16.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <!-- Responsive navbar-->
@@ -60,8 +61,23 @@
                 <!-- Post Content -->
                 <p>{{ post.content }}</p>
 
-                <hr/>
+                {% if post.file_upload %}
+                    <a href="{{ post.file_upload.url }}" class="btn btn-outline-dark" role="button" download>
+                        Download:
 
+                        {% if post.get_file_ext == 'csv' %}
+                            <i class="fas fa-file-csv"></i>
+                        {% elif post.get_file_ext == 'xlsx' or post.get_file_ext == 'xls' %}
+                            <i class="fas fa-file-excel"></i>
+                        {% elif post.get_file_ext == 'docx' or post.get_file_ext == 'doc' %}
+                            <i class="fas fa-file-word"></i>
+                        {% else %}
+                            <i class="far fa-file"></i>
+                        {% endif %}
+                            {{ post.get_file_name }}
+                    </a>
+                {% endif %}
+                <hr/>
                 <!-- Comments section-->
                 <section class="mb-5">
                     <div class="card bg-light">
