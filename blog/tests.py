@@ -123,3 +123,23 @@ class TestView(TestCase):
 
             # 2.6. 첫 번째 포스트의 내용(content)이 포스트 영역에 있다.
             self.assertIn(self.post_001.content, post_area.text)
+
+    def test_category_page(self):
+        # self.category_programming의 url을 가져와서 페이지가 잘 열리는지 검사
+        response = self.client.get(self.category_programming.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+
+        # html parsing한 후 네비게이션 바와 category card를 테스트
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.navbar_test(soup)
+        self.category_card_test(soup)
+
+        # 페이지 상단 뱃지 이름이 잘 나타나는지 확인
+        self.assertIn(self.category_programming.name, soup.h1.text)
+
+        # main area에 programming있는지 확인하고 post1만 있는지 확인
+        main_area = soup.find('div', id='main-area')
+        self.assertIn(self.category_programming.name, main_area.text)
+        self.assertIn(self.post_001.title, main_area.text)
+        self.assertNotIn(self.post_002.title, main_area.text)
+        self.assertNotIn(self.post_003.title, main_area.text)
