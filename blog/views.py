@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Post, Category
+from .models import Post, Category, Tag
 from django.views.generic import ListView, DetailView
 
 # FBV
@@ -60,6 +60,24 @@ def category_page(request, slug):
             'categories': Category.objects.all(),  # 모든 카테고리 목록을 템플릿에 전달
             'no_category_post_count': Post.objects.filter(category=None).count(),  # 카테고리가 없는 게시글의 개수를 템플릿에 전달
             'category': category,  # 현재 카테고리 객체를 템플릿에 전달
+            }
+    )
+
+# 특정 태그페이지를 보여주는 함수형 뷰
+def tag_page(request, slug):
+    #url에서 인자로 넘어온 slug와 동일한 slug를 쿼리셋에서 가져와 tag에 저장, 태그와 연결된 전체 포스트를 post_list에 저장
+    tag = Tag.objects.get(slug=slug)
+    post_list = tag.post_set.all()
+
+    # 페이지를 렌더링하며 필요한 데이터를 전달합니다.
+    return render(
+        request,
+        'blog/post_list.html',  # 렌더링할 템플릿 파일 경로
+        {
+            'post_list': post_list,  # 현재 카테고리에 해당하는 게시글 목록을 템플릿에 전달
+            'categories': Category.objects.all(),  # 모든 카테고리 목록을 템플릿에 전달
+            'no_category_post_count': Post.objects.filter(category=None).count(),  # 카테고리가 없는 게시글의 개수를 템플릿에 전달
+            'tag' : tag,  # 현재 태그 객체를 템플릿에 전달
         }
     )
 
@@ -74,3 +92,4 @@ class PostDetail(DetailView):
         context['categories'] = Category.objects.all()  # 모든 카테고리 목록을 컨텍스트에 추가
         context['no_category_post_count'] = Post.objects.filter(category=None).count()  # 카테고리가 없는 게시글 개수를 추가
         return context  # 컨텍스트 반환
+
