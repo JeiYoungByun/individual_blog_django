@@ -9,6 +9,8 @@ class TestView(TestCase):
         self.client = Client()
         self.user_trump = User.objects.create_user(username='trump', password='somepassword')
         self.user_obama = User.objects.create_user(username='obama', password='somepassword')
+        self.user_obama.is_staff = True
+        self.user_obama.save()
 
         self.category_programming = Category.objects.create(name='programming', slug='programming')
         self.category_music = Category.objects.create(name='music', slug='music')
@@ -114,40 +116,40 @@ class TestView(TestCase):
         main_area = soup.find('div', id='main-area')
         self.assertIn('아직 게시물이 없습니다', main_area.text)
 
-        def test_post_detail(self):
+    def test_post_detail(self):
 
-            # 1.2. 그 포스트의 url은 '/blog/1/'이다.
-            self.assertEqual(self.post_001.get_absolute_url(), '/blog/1/')
+        # 1.2. 그 포스트의 url은 '/blog/1/'이다.
+        self.assertEqual(self.post_001.get_absolute_url(), '/blog/1/')
 
-            # 2. 첫 번째 포스트의 상세 페이지 테스트
+        # 2. 첫 번째 포스트의 상세 페이지 테스트
 
-            # 2.1. 첫 번째 포스트의 url로 접근하면 정상적으로 작동한다(status code: 200).
-            response = self.client.get(self.post_001.get_absolute_url())
-            self.assertEqual(response.status_code, 200)
-            soup = BeautifulSoup(response.content, 'html.parser')
+        # 2.1. 첫 번째 포스트의 url로 접근하면 정상적으로 작동한다(status code: 200).
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
 
-            # 2.2. 포스트 목록 페이지와 똑같은 내비게이션 바가 있다.
-            self.navbar_test(soup)
+        # 2.2. 포스트 목록 페이지와 똑같은 내비게이션 바가 있다.
+        self.navbar_test(soup)
 
-            self.category_card_test(soup)
+        self.category_card_test(soup)
 
-            # 2.3. 첫 번째 포스트의 제목이 웹 브라우저 탭 타이틀에 들어 있다.
-            self.assertIn(self.post_001.title, soup.title.text)
+        # 2.3. 첫 번째 포스트의 제목이 웹 브라우저 탭 타이틀에 들어 있다.
+        self.assertIn(self.post_001.title, soup.title.text)
 
-            # 2.4. 첫 번째 포스트의 제목이 포스트 영역에 있다.
-            main_area = soup.find('div', id='main-area')
-            post_area = main_area.find('div', id='post-area')
-            self.assertIn(self.post_001.title, post_area.text)
+        # 2.4. 첫 번째 포스트의 제목이 포스트 영역에 있다.
+        main_area = soup.find('div', id='main-area')
+        post_area = main_area.find('div', id='post-area')
+        self.assertIn(self.post_001.title, post_area.text)
 
-            # 2.5. 첫 번째 포스트의 작성자(author)가 포스트 영역에 있다.
-            self.assertIn(self.user_trump.username.upper(), post_area.text)
+        # 2.5. 첫 번째 포스트의 작성자(author)가 포스트 영역에 있다.
+        self.assertIn(self.user_trump.username.upper(), post_area.text)
 
-            # 2.6. 첫 번째 포스트의 내용(content)이 포스트 영역에 있다.
-            self.assertIn(self.post_001.content, post_area.text)
+        # 2.6. 첫 번째 포스트의 내용(content)이 포스트 영역에 있다.
+        self.assertIn(self.post_001.content, post_area.text)
 
-            self.assertIn(self.teg_hello.name, post_area.text)
-            self.assertNotIn(self.tag_python.name, post_area.text)
-            self.assertNotIn(self.tag_python_kor.name, post_area.text)
+        self.assertIn(self.tag_hello.name, post_area.text)
+        self.assertNotIn(self.tag_python.name, post_area.text)
+        self.assertNotIn(self.tag_python_kor.name, post_area.text)
 
     def test_category_page(self):
         # self.category_programming의 url을 가져와서 페이지가 잘 열리는지 검사
@@ -194,9 +196,13 @@ class TestView(TestCase):
         response = self.client.get('/blog/create_post/')
         self.assertNotEqual(response.status_code, 200)
 
-        # 로그인을 한다.
+        # staff가 아닌 trump가 로그인을 한다.
         self.client.login(username='trump', password='somepassword')
+        response = self.client.get('/blog/create_post/')
+        self.assertNotEqual(response.status_code, 200)
 
+        # staff인 obama로 로그인한다.
+        self.client.login(username='obama', password='somepassword')
         response = self.client.get('/blog/create_post/')
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -215,4 +221,4 @@ class TestView(TestCase):
         self.assertEqual(Post.objects.count(), 4)
         last_post = Post.objects.last()
         self.assertEqual(last_post.title, "Post Form 만들기")
-        self.assertEqual(last_post.author.username, 'trump')
+        self.assertEqual(last_post.author.username, 'obama')

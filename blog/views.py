@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Post, Category, Tag
 from django.views.generic import ListView, DetailView, CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 # FBV
 # def index(request):
@@ -94,22 +94,33 @@ def tag_page(request, slug):
         }
     )
 
-class PostCreate(LoginRequiredMixin, CreateView):
+
+class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    # Post 모델과 연결된 뷰로, 게시글을 생성하는 역할을 합니다.
     model = Post
+
+    # 폼에서 입력받을 필드를 정의합니다.
     fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
+
+    def test_func(self):
+        # 사용자가 superuser(관리자)거나 staff(스태프)일 경우 True를 반환합니다.
+        # 그렇지 않으면 False를 반환하여 접근을 제한합니다.
+        return self.request.user.is_superuser or self.request.user.is_staff
 
     def form_valid(self, form):
         # 현재 요청을 보낸 사용자를 가져옵니다.
         current_user = self.request.user
 
-        # 사용자가 인증된 상태(로그인 상태)인지 확인합니다.
-        if current_user.is_authenticated:
+        # 사용자가 인증된 상태(로그인 상태)인지 확인하고, 관리자 또는 스태프인지 추가 확인합니다.
+        if current_user.is_authenticated and (current_user.is_staff or current_user.is_superuser):
             # 폼의 author 필드에 현재 사용자를 할당합니다.
             form.instance.author = current_user
 
-            # 부모 클래스의 form_valid 메서드를 호출하여 폼이 유효하다는 것을 처리하고 저장합니다.
+            # 부모 클래스(CreateView)의 form_valid 메서드를 호출하여
+            # 폼 데이터를 저장하고 기본 동작(리디렉션 등)을 수행합니다.
             return super(PostCreate, self).form_valid(form)
         else:
-            # 사용자가 로그인되지 않은 경우, 블로그 메인 페이지로 리디렉션합니다.
+            # 사용자가 인증되지 않았거나 권한이 없는 경우, 블로그 메인 페이지로 리디렉션합니다.
             return redirect('/blog/')
+
 
