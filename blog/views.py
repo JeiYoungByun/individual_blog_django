@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Post, Category, Tag
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # FBV
 # def index(request):
@@ -36,6 +37,18 @@ class PostList(ListView):
     def get_context_data(self, **kwargs):
         # 부모 클래스의 get_context_data를 호출하여 기본 컨텍스트를 가져옴
         context = super(PostList, self).get_context_data()
+        context['categories'] = Category.objects.all()  # 모든 카테고리 목록을 컨텍스트에 추가
+        context['no_category_post_count'] = Post.objects.filter(category=None).count()  # 카테고리가 없는 게시글 개수를 추가
+        return context  # 컨텍스트 반환
+
+# 게시글 상세 내용을 보여주는 클래스형 뷰
+class PostDetail(DetailView):
+    model = Post  # Post 모델과 연결
+
+    # 추가적인 컨텍스트 데이터를 템플릿에 전달
+    def get_context_data(self, **kwargs):
+        # 부모 클래스의 get_context_data를 호출하여 기본 컨텍스트를 가져옴
+        context = super(PostDetail, self).get_context_data()
         context['categories'] = Category.objects.all()  # 모든 카테고리 목록을 컨텍스트에 추가
         context['no_category_post_count'] = Post.objects.filter(category=None).count()  # 카테고리가 없는 게시글 개수를 추가
         return context  # 컨텍스트 반환
@@ -81,15 +94,22 @@ def tag_page(request, slug):
         }
     )
 
-# 게시글 상세 내용을 보여주는 클래스형 뷰
-class PostDetail(DetailView):
-    model = Post  # Post 모델과 연결
+class PostCreate(LoginRequiredMixin, CreateView):
+    model = Post
+    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
 
-    # 추가적인 컨텍스트 데이터를 템플릿에 전달
-    def get_context_data(self, **kwargs):
-        # 부모 클래스의 get_context_data를 호출하여 기본 컨텍스트를 가져옴
-        context = super(PostDetail, self).get_context_data()
-        context['categories'] = Category.objects.all()  # 모든 카테고리 목록을 컨텍스트에 추가
-        context['no_category_post_count'] = Post.objects.filter(category=None).count()  # 카테고리가 없는 게시글 개수를 추가
-        return context  # 컨텍스트 반환
+    def form_valid(self, form):
+        # 현재 요청을 보낸 사용자를 가져옵니다.
+        current_user = self.request.user
+
+        # 사용자가 인증된 상태(로그인 상태)인지 확인합니다.
+        if current_user.is_authenticated:
+            # 폼의 author 필드에 현재 사용자를 할당합니다.
+            form.instance.author = current_user
+
+            # 부모 클래스의 form_valid 메서드를 호출하여 폼이 유효하다는 것을 처리하고 저장합니다.
+            return super(PostCreate, self).form_valid(form)
+        else:
+            # 사용자가 로그인되지 않은 경우, 블로그 메인 페이지로 리디렉션합니다.
+            return redirect('/blog/')
 
