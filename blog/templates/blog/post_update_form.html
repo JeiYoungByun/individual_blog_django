@@ -1,0 +1,21 @@
+{% extends 'blog/base_full_width.html' %}  <!-- 'blog/base.html'을 기반으로 템플릿을 확장합니다. -->
+
+{% block head_title %}Edit Post - Blog{% endblock %}  <!-- head 영역의 title을 'Create Post - Blog'로 설정합니다. -->
+
+{% block main_area %}
+    <h1>Edit Post</h1>  <!-- 페이지의 제목을 'Create New Post'로 설정합니다. -->
+    <hr/>  <!-- 제목 아래에 구분선(<hr>)을 추가합니다. -->
+
+    <!-- 게시글을 작성하는 폼을 생성합니다. -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}  <!-- CSRF 공격을 방지하기 위한 CSRF 토큰을 포함합니다. -->
+
+        <!-- Django에서 자동으로 생성된 폼을 렌더링합니다. -->
+        <table>
+            {{ form }}  <!-- form 객체를 테이블 형식으로 출력합니다. -->
+        </table>
+
+        <!-- 폼 제출 버튼, 'Submit' 텍스트가 표시됩니다. -->
+        <button type="submit" class="btn btn-primary float-right">Submit</button>
+    </form>
+{% endblock %}

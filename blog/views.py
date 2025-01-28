@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from .models import Post, Category, Tag
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 
 # FBV
 # def index(request):
@@ -123,4 +124,18 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             # 사용자가 인증되지 않았거나 권한이 없는 경우, 블로그 메인 페이지로 리디렉션합니다.
             return redirect('/blog/')
 
+class PostUpdate(LoginRequiredMixin, UpdateView):
+    model = Post
+    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category', 'tags']
+
+    template_name = 'blog/post_update_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # 사용자가 인증되었는지 확인하고, 현재 사용자가 해당 객체의 작성자인지 확인
+        if request.user.is_authenticated and request.user == self.get_object().author:
+            # 조건이 만족되면, 부모 클래스(PostUpdate)의 dispatch 메서드를 호출하여 요청을 처리
+            return super(PostUpdate, self).dispatch(request, *args, **kwargs)
+        else:
+            # 인증되지 않았거나 작성자가 아닐 경우, PermissionDenied 예외를 발생시켜 접근을 차단
+            raise PermissionDenied
 
