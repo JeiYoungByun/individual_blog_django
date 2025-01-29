@@ -3,7 +3,7 @@ from .models import Post, Category, Tag
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-
+from django.utils.text import slugify
 # FBV
 # def index(request):
 #    posts = Post.objects.all().order_by('-pk')
@@ -116,10 +116,40 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         if current_user.is_authenticated and (current_user.is_staff or current_user.is_superuser):
             # 폼의 author 필드에 현재 사용자를 할당합니다.
             form.instance.author = current_user
+            # 부모 클래스의 form_valid 메서드를 호출하여 폼 제출을 처리하고 응답을 가져옵니다.
+            response = super(PostCreate, self).form_valid(form)
 
-            # 부모 클래스(CreateView)의 form_valid 메서드를 호출하여
-            # 폼 데이터를 저장하고 기본 동작(리디렉션 등)을 수행합니다.
-            return super(PostCreate, self).form_valid(form)
+            # POST 요청에서 'tags_str' 값을 가져옵니다.
+            tags_str = self.request.POST.get('tags_str')
+            if tags_str:
+                # 태그 문자열의 앞뒤 공백을 제거합니다.
+                tags_str = tags_str.strip()
+
+                # 쉼표를 세미콜론으로 대체하여 구분자를 표준화합니다.
+                tags_str = tags_str.replace(',', ';')
+
+                # 세미콜론을 기준으로 태그 문자열을 개별 태그 목록으로 분리합니다.
+                tags_list = tags_str.split(';')
+
+                # 각 태그에 대해 반복 처리합니다.
+                for t in tags_list:
+                    # 태그의 앞뒤 공백을 제거합니다.
+                    t = t.strip()
+
+                    # 이름으로 Tag 객체를 가져오거나, 존재하지 않으면 새로 생성합니다.
+                    tag, is_tag_created = Tag.objects.get_or_create(name=t)
+
+                    # 새로 생성된 Tag인 경우, 슬러그를 생성하고 저장합니다.
+                    if is_tag_created:
+                        tag.slug = slugify(t, allow_unicode=True)
+                        tag.save()
+
+                    # 해당 태그를 게시물의 태그 필드에 추가합니다.
+                    self.object.tags.add(tag)
+
+            # 부모 클래스의 form_valid 메서드에서 반환된 응답을 반환합니다.
+            return response
+
         else:
             # 사용자가 인증되지 않았거나 권한이 없는 경우, 블로그 메인 페이지로 리디렉션합니다.
             return redirect('/blog/')
