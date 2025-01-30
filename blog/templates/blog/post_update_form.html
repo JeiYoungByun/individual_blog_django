@@ -12,7 +12,11 @@
 
         <!-- Django에서 자동으로 생성된 폼을 렌더링합니다. -->
         <table>
-            {{ form }}  <!-- form 객체를 테이블 형식으로 출력합니다. -->
+            {{ form }}<!-- form 객체를 테이블 형식으로 출력합니다. -->
+            <tr>
+                <th><label for="id_tags_str">Tags:</label></th>
+                <td><input type="text" name="tags_str" id="id_tags_str" value="{{ tags_str_default }}"></td>
+            </tr>
         </table>
 
         <!-- 폼 제출 버튼, 'Submit' 텍스트가 표시됩니다. -->

@@ -235,43 +235,67 @@ class TestView(TestCase):
     def test_update_post(self):
         update_post_url = f'/blog/update_post/{self.post_003.pk}/'
 
-        #로그인하지 않은 경우
+        # 경우 1: 로그인하지 않은 상태에서 업데이트 페이지에 접근
         response = self.client.get(update_post_url)
-        self.assertNotEqual(response.status_code, 200)
+        self.assertNotEqual(response.status_code, 200, "인증되지 않은 사용자는 포스트 수정 페이지에 접근할 수 없어야 합니다.")
 
-        #로그인은 했지만 작성자가 아닌 경우
-        self.assertNotEqual(self.post_003.author, self.user_trump)
-        self.client.login(
+        # 경우 2: 로그인은 했지만 작성자가 아닌 사용자가 접근
+        self.assertNotEqual(self.post_003.author, self.user_trump, "user_trump는 post_003의 작성자가 아니어야 합니다.")
+        login_successful = self.client.login(
             username=self.user_trump.username,
             password='somepassword'
         )
+        self.assertTrue(login_successful, "user_trump로 로그인하는 데 실패했습니다.")
         response = self.client.get(update_post_url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 403, "작성자가 아닌 사용자는 403 Forbidden 응답을 받아야 합니다.")
 
-        #작성자(obama)가 접근하는 경우
-        self.client.login(
+        # 경우 3: 작성자(obama)로 로그인하여 업데이트 페이지에 접근
+        login_successful = self.client.login(
             username=self.post_003.author.username,
             password='somepassword'
         )
+        self.assertTrue(login_successful, "작성자로 로그인하는 데 실패했습니다.")
         response = self.client.get(update_post_url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200, "작성자는 포스트 수정 페이지에 접근할 수 있어야 합니다.")
+
+        # 응답 내용을 BeautifulSoup으로 파싱
         soup = BeautifulSoup(response.content, 'html.parser')
 
-        self.assertEqual('Edit Post - Blog', soup.title.text)
-        main_area = soup.find('div', id = 'main-area')
-        self.assertIn('Edit Post', main_area.text)
+        # 페이지 제목 확인
+        self.assertEqual('Edit Post - Blog', soup.title.text, "페이지 제목이 'Edit Post - Blog'이어야 합니다.")
 
+        # 페이지의 메인 영역 찾기
+        main_area = soup.find('div', id='main-area')
+        self.assertIn('Edit Post', main_area.text, "메인 영역에 'Edit Post'가 포함되어야 합니다.")
+
+        # 메인 영역에 'id_tags_str' ID를 가진 input 요소가 있는지 확인
+        tag_str_input = main_area.find('input', id='id_tags_str')
+        self.assertTrue(tag_str_input, "메인 영역에 'id_tags_str' ID를 가진 input 요소가 있어야 합니다.")
+        self.assertIn('파이썬 공부; python', tag_str_input.attrs['value'], "태그 문자열에 '파이썬 공부; python'이 포함되어야 합니다.")
+
+        # POST 요청을 통해 포스트 수정
         response = self.client.post(
             update_post_url,
             {
-                'title': '세 번째 포스트를 수정했습니다. ',
+                'title': '세 번째 포스트를 수정했습니다.',
                 'content': '안녕 세계? 우리는 하나!',
-                'category' : self.category_music.pk
+                'category': self.category_music.pk,
+                'tags_str': '파이썬 공부; 한글 태그, some tag'
             },
             follow=True
         )
+
+        # POST 요청 후 응답 내용을 다시 파싱
         soup = BeautifulSoup(response.content, 'html.parser')
         main_area = soup.find('div', id='main-area')
-        self.assertIn('세 번째 포스트를 수정했습니다.', main_area.text)
-        self.assertIn('안녕 세계? 우리는 하나!', main_area.text)
-        self.assertIn(self.category_music.name, main_area.text)
+
+        # 수정된 내용이 메인 영역에 포함되어 있는지 확인
+        self.assertIn('세 번째 포스트를 수정했습니다.', main_area.text, "수정된 제목이 메인 영역에 포함되어야 합니다.")
+        self.assertIn('안녕 세계? 우리는 하나!', main_area.text, "수정된 내용이 메인 영역에 포함되어야 합니다.")
+        self.assertIn(self.category_music.name, main_area.text, "수정된 카테고리가 메인 영역에 포함되어야 합니다.")
+        self.assertIn('파이썬 공부', main_area.text, "태그 '파이썬 공부'가 메인 영역에 포함되어야 합니다.")
+        self.assertIn('한글 태그', main_area.text, "태그 '한글 태그'가 메인 영역에 포함되어야 합니다.")
+        self.assertIn('some tag', main_area.text, "태그 'some tag'가 메인 영역에 포함되어야 합니다.")
+
+        # 업데이트 후 'python' 태그가 더 이상 포함되지 않았는지 확인
+        self.assertNotIn('python', main_area.text, "업데이트 후 태그 'python'이 더 이상 포함되지 않아야 합니다.")

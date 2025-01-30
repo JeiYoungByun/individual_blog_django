@@ -160,6 +160,16 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
 
     template_name = 'blog/post_update_form.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(PostUpdate, self).get_context_data()
+        if self.object.tags.exists():
+            tags_str_list = list()
+            for t in self.object.tags.all():
+                tags_str_list.append(t.name)
+            context['tags_str_default'] = '; '.join(tags_str_list)
+
+        return context
+
     def dispatch(self, request, *args, **kwargs):
         # 사용자가 인증되었는지 확인하고, 현재 사용자가 해당 객체의 작성자인지 확인
         if request.user.is_authenticated and request.user == self.get_object().author:
@@ -169,3 +179,41 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
             # 인증되지 않았거나 작성자가 아닐 경우, PermissionDenied 예외를 발생시켜 접근을 차단
             raise PermissionDenied
 
+    def form_valid(self, form):
+        # 부모 클래스(PostUpdate)의 form_valid 메서드를 호출하여 기본 동작 수행
+        response = super(PostUpdate, self).form_valid(form)
+
+        # 현재 게시글(self.object)에 연결된 모든 태그를 초기화 (기존 태그 제거)
+        self.object.tags.clear()
+
+        # 클라이언트가 입력한 'tags_str' 값을 가져옴 (POST 요청에서 전달된 태그 문자열)
+        tags_str = self.request.POST.get('tags_str')
+
+        if tags_str:
+            # 앞뒤 공백 제거
+            tags_str = tags_str.strip()
+
+            # 쉼표(,)를 세미콜론(;)으로 변경하여 일관된 구분자로 변환
+            tags_str = tags_str.replace(',', ';')
+
+            # 세미콜론(;)을 기준으로 문자열을 분리하여 태그 리스트 생성
+            tags_list = tags_str.split(';')
+
+            # 태그 리스트를 순회하며 개별 태그 처리
+            for t in tags_list:
+                # 개별 태그 문자열의 앞뒤 공백 제거
+                t = t.strip()
+
+                # 태그 이름을 기준으로 데이터베이스에서 조회하거나 새로 생성
+                tag, is_tag_created = Tag.objects.get_or_create(name=t)
+
+                # 새롭게 생성된 태그라면 slug 필드를 설정 후 저장
+                if is_tag_created:
+                    tag.slug = slugify(t, allow_unicode=True)
+                    tag.save()
+
+                # 현재 게시글(self.object)에 태그 추가
+                self.object.tags.add(tag)
+
+        # 부모 클래스의 form_valid 메서드에서 반환된 response를 그대로 반환
+        return response
