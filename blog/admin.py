@@ -1,8 +1,9 @@
 from django.contrib import admin
+from markdownx.admin import MarkdownxModelAdmin
 from .models import Post, Category, Tag
 
 # Post 모델을 기본 설정으로 관리자(admin) 페이지에 등록
-admin.site.register(Post)
+admin.site.register(Post, MarkdownxModelAdmin)
 
 # Category 모델에 대한 관리자 페이지 설정
 class CategoryAdmin(admin.ModelAdmin):
