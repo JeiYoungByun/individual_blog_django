@@ -1,32 +1,21 @@
 {% extends 'blog/base_full_width.html' %}  <!-- 'blog/base.html'을 기반으로 템플릿을 확장합니다. -->
-
+{% load crispy_forms_tags %}
 {% block head_title %}Create Post - Blog{% endblock %}  <!-- head 영역의 title을 'Create Post - Blog'로 설정합니다. -->
 
 {% block main_area %}
-    <h1>Create New Post</h1>  <!-- 페이지의 제목을 'Create New Post'로 설정합니다. -->
-    <hr/>  <!-- 제목 아래에 구분선(<hr>)을 추가합니다. -->
+    <h1>Create New Post</h1>
+    <hr/>
 
-    <!-- 게시글을 작성하는 폼을 생성합니다. -->
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}  <!-- CSRF 공격을 방지하기 위한 CSRF 토큰을 포함합니다. -->
+            {{ form | crispy }}  <!-- form 객체를 테이블 형식으로 출력합니다. -->
+            <div id="div_id_tags_str">
+                <label for="id_tags_str">Tags:</label>
+                <input type="text" name="tags_str" id="id_tags_str" class="textinput textInput form-control">
+            </div>
+            <br/>
 
-        <!-- Django에서 자동으로 생성된 폼을 렌더링합니다. -->
-        <table>
-            {{ form }}  <!-- form 객체를 테이블 형식으로 출력합니다. -->
-            <tr>
-                <!-- 테이블 헤더 셀: 'Tags:' 레이블을 표시 -->
-                <th>
-                    <label for="id_tags_str">Tags:</label>
-                </th>
-
-                <!-- 테이블 데이터 셀: 사용자가 태그를 입력할 수 있는 텍스트 필드 -->
-                <td>
-                    <input type="text" name="tags_str" id="id_tags_str">
-                </td>
-            </tr>
-        </table>
-
-        <!-- 폼 제출 버튼, 'Submit' 텍스트가 표시됩니다. -->
-        <button type="submit" class="btn btn-primary float-right">Submit</button>
+            <!-- 폼 제출 버튼, 'Submit' 텍스트가 표시됩니다. -->
+            <button type="submit" class="btn btn-primary float-right">Submit</button>
     </form>
 {% endblock %}
