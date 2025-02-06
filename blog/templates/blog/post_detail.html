@@ -1,5 +1,5 @@
 {% extends 'blog/base.html' %}
-
+{% load crispy_forms_tags %}
 {% block head_title %}
     {{ post.title }} - Blog
 {% endblock %}
@@ -78,29 +78,59 @@
         <div class="card my-4">
             <h5 class="card-header">Leave a Comment:</h5>
             <div class="card-body">
-                <form>
+                {% if user.is_authenticated %}
+                    <form id="comment-form" method="POST" action="{% url 'new_comment' post.pk %}">
+                    {% csrf_token %}
                     <div class="form-group">
-                        <textarea class="form-control" rows="3"></textarea>
+                        {{ comment_form | crispy }}
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
+                {% else %}
+                    <a role="button" class="btn btn-outline-dark btn-block btn-sm" href="#" data-toggle="modal" data-target="#loginModal">Log in and leave a comment</a>
+                {% endif %}
             </div>
         </div>
 
         {% if post.comment_set.exists %}
-            {% for comment in post.comment_set.iterator %}
+            <h5>Comments on "{{ post.title }}"</h5>
+            {% for comment in post.comment_set.all %}
                 <!-- Single Comment -->
                 <div class="media mb-4" id="comment-{{ comment.pk }}">
-                    <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-                    <div class="media-body">
-                        <h5 class="mt-0">
-                            {{ comment.author.username }} &nbsp;&nbsp;
-                            <small class="text-muted">
-                                {{ comment.created_at }}
-                            </small>
-                        </h5>
-                        <p>{{ comment.content | linebreaks }}</p>
-                    </div>
+                <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                <div class="media-body">
+
+                    <!-- edit button -->
+                    {% if user.is_authenticated and comment.author == user %}
+                        <a role="button"
+                           class="btn btn-sm btn-info float-right"
+                           id="comment-{{ comment.pk }}-update-btn"
+                           href="/blog/update_comment/{{ comment.pk }}/">
+                            edit
+                        </a>
+                    {% endif %}
+
+                <!-- 댓글 작성자랑 작성시간 -->
+                <h5 class="mt-0">
+                    {{ comment.author.username }} &nbsp;&nbsp;
+                    {% if comment.parent %}
+                    <small>&nbsp; {{ comment.parent }} </small>
+                    {% endif %}
+                    <small class="text-muted">
+                    &nbsp;&nbsp; {{ comment.created_at }}
+                    </small>
+                </h5>
+
+                <!-- 댓글 수정 시간 -->
+                <p>{{ comment.content | linebreaks }}</p>
+                    {% if comment.created_at != comment.modified_at %}
+                    <p class="text-muted float-right">
+                        <small>
+                            Updated: {{ comment.modified_at }}
+                        </small>
+                    </p>
+                    {% endif %}
+                </div>
                 </div>
             {% endfor %}
         {% endif %}

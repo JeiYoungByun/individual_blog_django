@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from markdownx.models import MarkdownxField
 from markdownx.utils import markdown
+from mptt.models import MPTTModel, TreeForeignKey
 import os
 
 
@@ -62,17 +63,30 @@ class Post(models.Model):
     def get_content_markdown(self):
         return markdown(self.content)
 
-class Comment(models.Model):
+class Comment(MPTTModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
+    parent = TreeForeignKey(
+        'self', on_delete=models.CASCADE, null=True, blank=True, related_name='children'
+    ) # self : 자기 자신을 참조,
+
+    # MPTT 필드 기본값 설정
+    level = models.PositiveIntegerField(default=0)
+    lft = models.PositiveIntegerField(default=0)
+    rght = models.PositiveIntegerField(default=0)
+    tree_id = models.PositiveIntegerField(default=0)
+
+    # MPTT 설정: 댓글을 `created_at` 기준으로 정렬
+    class MPTTMeta:
+        order_insertion_by = ['created_at']
 
     def __str__(self):
-        return f'{self.author}::{self.content}'
+        return f'comment on {self.author.username}'
 
     def get_absolute_url(self):
-        return f'{self.post.get_absolute_url()}#comment-{self.pk}'
+        return f'{self.post.get_absolute_url()}#comment-{self.pk}' # 댓글 작성 후 해당 페이지로 자동 스크롤
 
 

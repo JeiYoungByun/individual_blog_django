@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django_extensions',
 
     'crispy_forms',
+    'crispy_bootstrap4',
     'markdownx',
     'django.contrib.sites',
     'allauth',
@@ -48,6 +49,8 @@ INSTALLED_APPS = [
 
     'blog',
     'single_pages',
+    'mptt',
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [
