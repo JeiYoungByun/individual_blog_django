@@ -7,7 +7,7 @@
 {% block main_area %}
     <div id ="post-area">
         {% if post.category %}
-        <span class="badge badge-seconday float-right">{{ post.category }}</span>
+        <span class="badge badge-secondary float-right">{{ post.category }}</span>
         {% else %}
         <span class="badge badge-secondary float-right">미분류</span>
         {% endif %}
@@ -74,26 +74,36 @@
     </div>
 
     <div id="comment-area">
-                <!-- Comments section-->
-                <section class="mb-5">
-                    <div class="card bg-light">
-                        <div class="card-body">
-                            <!-- Comment form-->
-                            <form class="mb-4">
-                                <textarea class="form-control" rows="3" placeholder="댓글을 입력하세요"></textarea>
-                            </form>
-                        </div>
+        <!-- Comment Form -->
+        <div class="card my-4">
+            <h5 class="card-header">Leave a Comment:</h5>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <textarea class="form-control" rows="3"></textarea>
                     </div>
-                </section>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
 
-                <!-- 댓글 목록 -->
-                <section class="mt-4">
-                    <h3>댓글</h3>
-                    <div class="card bg-light">
-                        <div class="card-body">
-                            <p>댓글이 없습니다. 첫 댓글을 작성해보세요!</p>
-                        </div>
+        {% if post.comment_set.exists %}
+            {% for comment in post.comment_set.iterator %}
+                <!-- Single Comment -->
+                <div class="media mb-4" id="comment-{{ comment.pk }}">
+                    <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                    <div class="media-body">
+                        <h5 class="mt-0">
+                            {{ comment.author.username }} &nbsp;&nbsp;
+                            <small class="text-muted">
+                                {{ comment.created_at }}
+                            </small>
+                        </h5>
+                        <p>{{ comment.content | linebreaks }}</p>
                     </div>
-                </section>
+                </div>
+            {% endfor %}
+        {% endif %}
     </div>
+    <hr/>
 {% endblock %}
