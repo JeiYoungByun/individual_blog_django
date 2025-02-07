@@ -5,6 +5,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.utils.text import slugify
 from .forms import CommentForm
+from django.db.models import Q
+
 # FBV
 # def index(request):
 #    posts = Post.objects.all().order_by('-pk')
@@ -268,3 +270,20 @@ def delete_comment(request, pk):
         return redirect(post.get_absolute_url())
     else:
         raise PermissionDenied
+
+class PostSearch(PostList):
+    paginate_by = None
+
+    def get_queryset(self):
+        q = self.kwargs['q'] # 검색어를 q에 저장
+        post_list = Post.objects.filter(
+            Q(title__contains=q) | Q(tags__name__contains=q) # title에 q를 포함했거나 tags의 name에 q를 포함한 post 레코드를 db에서 가져옴
+        ).distinct() # distinct()은 중복이 있을 때 한번만 나타나게함
+        return post_list
+
+    def get_context_data(self, **kwargs):
+        context = super(PostSearch, self).get_context_data()
+        q = self.kwargs['q']
+        context['search_info'] = f'Search: {q} ({self.get_queryset().count()})'
+
+        return context
