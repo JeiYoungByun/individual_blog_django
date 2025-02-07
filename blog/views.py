@@ -34,6 +34,7 @@ class PostList(ListView):
     model = Post  # Post 모델과 연결
     # template_name = 'blog/post_list.html'  # 기본 템플릿 파일 이름 (주석 처리된 경우, 기본값은 post_list.html)
     ordering = '-pk'  # 게시글을 pk(기본 키) 역순으로 정렬
+    paginate_by = 5
 
     # 추가적인 컨텍스트 데이터를 템플릿에 전달
     def get_context_data(self, **kwargs):
