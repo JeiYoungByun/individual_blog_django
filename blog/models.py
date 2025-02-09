@@ -69,24 +69,25 @@ class Comment(MPTTModel):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
+
     parent = TreeForeignKey(
-        'self', on_delete=models.CASCADE, null=True, blank=True, related_name='children'
-    ) # self : 자기 자신을 참조,
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='children'
+    )
 
-    # MPTT 필드 기본값 설정
-    level = models.PositiveIntegerField(default=0)
-    lft = models.PositiveIntegerField(default=0)
-    rght = models.PositiveIntegerField(default=0)
-    tree_id = models.PositiveIntegerField(default=0)
-
-    # MPTT 설정: 댓글을 `created_at` 기준으로 정렬
     class MPTTMeta:
         order_insertion_by = ['created_at']
 
     def __str__(self):
-        return f'comment on {self.author.username}'
+        # 1) 부모가 있으면 부모의 'author.username' 정도만 표시
+        if self.parent:
+            return f'{self.author.username} → parent={self.parent.author.username}'
+        # 2) 부모가 없으면 (루트 댓글)이라는 의미로 표시
+        else:
+            return f'{self.author.username} (root comment)'
 
     def get_absolute_url(self):
-        return f'{self.post.get_absolute_url()}#comment-{self.pk}' # 댓글 작성 후 해당 페이지로 자동 스크롤
-
-
+        return f'{self.post.get_absolute_url()}#comment-{self.pk}'

@@ -1,19 +1,112 @@
 <!DOCTYPE html>
-<html lang="ko">
+{% load static %}
+<html lang="jp">
 <head>
     <meta charset="UTF-8">
-    <title>개발자 달타냥입니다.</title>
+    <title> About Byun JeiYoung </title>
+
+    <link rel="stylesheet" href="{% static 'blog/bootstrap/bootstrap.min.css' %}" media="screen">
+    <link rel="stylesheet" href="{% static 'single_pages/css/about_me.css' %}" media="screen">
+    <script src="https://kit.fontawesome.com/726bbd6862.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
-<nav>
-  <a href="/blog">Blog</a>
-  <a href="/about_me/">About me</a>
-</nav>
+{% include 'blog/navbar.html' %}
 
-<h1>안녕하세요. 달타냥입니다</h1>
-<h2>이력</h2>
-<h2>Portfolio</h2>
-<h3>아직 공사중입니다.</h3>
+<section>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1>About Byun JeiYoung</h1>
+                <br/>
+                <p class="lead">
+                    Front End : Bootstrap<br/>
+                    Back End : Django<br/>
+                    SQL : Postgresql<br/>
+                    Distribution : Docker, Git, AWS
+                </p>
+
+                <ul>
+                    <li>履歴</li>
+                    <ul>
+                        <li>Posung High School(2015.03 ~ 2018.02)</li>
+                        <li>University of Seoul Dep. of Mechanical and Information Engineering(2018.03 ~)</li>
+                    </ul>
+                </ul>
+
+            </div>
+            <div class="col-lg-4">
+                <img class="img-fluid" src="{% static 'single_pages/images/jeiyoung.jpg' %}">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bg-light margin-for-footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>PORTFOLIO</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card" data-toggle="modal" data-target="#pycon2017">
+                    <div class="card-body">
+                        <h5 class="card-title">個人ブログサイト</h5>
+                        <p>djangoとbootstrapを活用して個人ブログサイトを制作してみました。</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="pycon2017" tabindex="-1" role="dialog" aria-labelledby="pycon2017ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pycon2017ModalLabel">個人ブログサイト</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <p>Front End : Bootstrap<br/>
+                    Back End : Django<br/>
+                    SQL : Postgresql<br/>
+                    Distribution : Docker, Git, AWS</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="fixed-bottom">
+    {% include 'blog/footer.html' %}
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+
+
 </body>
 </html>
