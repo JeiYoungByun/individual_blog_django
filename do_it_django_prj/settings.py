@@ -20,12 +20,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '^il&w&37030%c0kbg@9(h+k(jsps53_)brjyw)mksmj=*c^5vf'
+SECRET_KEY = os.environ.get('SECRET_KEY', '^il&w&37030%c0kbg@9(h+k(jsps53_)brjyw)mksmj=*c^5vf')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(os.environ.get('DEBUG', 1))
 
-ALLOWED_HOSTS = []
+if os.environ.get('DJANGO_ALLOWED_HOSTS'):
+    ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(' ')
+else:
+    ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -90,11 +93,14 @@ WSGI_APPLICATION = 'do_it_django_prj.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'do_it_django_dev'),
+        'USER': os.getenv('POSTGRES_USER', 'do_it_django_db_user'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'do_it_django_db_password'),
+        'HOST': os.getenv('POSTGRES_HOST', 'db'),  # 컨테이너 이름을 `db`로 설정했으면 그대로 사용
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
