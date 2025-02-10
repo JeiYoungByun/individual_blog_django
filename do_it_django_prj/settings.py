@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 
+from django.conf.global_settings import STATIC_ROOT
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -94,13 +96,14 @@ WSGI_APPLICATION = 'do_it_django_prj.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'do_it_django_dev'),
-        'USER': os.getenv('POSTGRES_USER', 'do_it_django_db_user'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'do_it_django_db_password'),
-        'HOST': os.getenv('POSTGRES_HOST', 'db'),  # 컨테이너 이름을 `db`로 설정했으면 그대로 사용
-        'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        'NAME': 'do_it_django_prod',
+        'USER': 'do_it_django_db_user_prod',
+        'PASSWORD': 'do_it_django_db_password_prod',
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -139,6 +142,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, '_static')
+
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]

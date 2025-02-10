@@ -171,3 +171,6 @@ _media/
 
 # PyPI configuration file
 .pypirc
+
+.env.prod
+.env.prod.db

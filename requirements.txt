@@ -17,11 +17,13 @@ django-js-asset
 django-markdownx
 django-mptt
 executing
+gunicorn
 idna
 ipython
 jedi
 Markdown
 matplotlib-inline
+packaging
 parso
 pillow
 prompt_toolkit
