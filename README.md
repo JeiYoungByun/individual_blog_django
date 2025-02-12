@@ -1,14 +1,21 @@
-# individual_blog_django
-Individual Blog using Django &amp; Bootstrap
+# 📝 Individual Blog using Django & Bootstrap
 
-##stacks
-frontend : bootstrap
-backend : django
-docker, AWS 
+## 🚀 Stacks
+- **Frontend** : Bootstrap  
+- **Backend** : Django  
+- **Deployment** : Docker, AWS  
 
-##function
--login,logout(by google or id&password)
--multi-comment
--post search
--tags, categories, authors
+## 🔧 Features
+- 🔑 **User Authentication**  
+  - Login & Logout (Google OAuth, ID & Password)  
+- 💬 **Multi-comment System**  
+  - Users can leave multiple comments per post  
+- 🔍 **Post Search**  
+  - Search for blog posts by title or content  
+- 🏷️ **Tags, Categories, Authors**  
+  - Organize posts with tags and categories  
+  - Display author information  
+
+---
+💡 *This blog aims to be a fully functional personal blog with essential features, built using Django and Bootstrap for a seamless experience.*  
 
