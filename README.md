@@ -2,7 +2,8 @@
 
 ## 🚀 Stacks
 - **Frontend** : Bootstrap  
-- **Backend** : Django  
+- **Backend** : Django
+- **SQL** : PostgreSQL 
 - **Deployment** : Docker, AWS  
 
 ## 🔧 Features
