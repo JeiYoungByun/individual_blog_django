@@ -17,6 +17,4 @@
   - Organize posts with tags and categories  
   - Display author information  
 
----
-💡 *This blog aims to be a fully functional personal blog with essential features, built using Django and Bootstrap for a seamless experience.*  
 
