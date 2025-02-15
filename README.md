@@ -14,8 +14,7 @@
 - 🔍 **Post Search**  
   - Search for blog posts by title or content  
 - 🏷️ **Tags, Categories, Authors**  
-  - Organize posts with tags and categories  
-  - Display author information  
+  - Organize posts with tags and categories   
 
 ## 🔗 Website  
 👉 [www.bjymyblog.com](http://www.bjymyblog.com/)
