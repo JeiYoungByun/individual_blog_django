@@ -18,7 +18,7 @@
   - Display author information  
 
 ## 🔗 Website  
-👉 [Visit My Blog](http://www.bjymyblog.com/)
+👉 [Visit My Blog](http://www.bjymyblog.com/) www.bjymyblog.com
 
 
 
