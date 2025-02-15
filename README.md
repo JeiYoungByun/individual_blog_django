@@ -8,7 +8,7 @@
 
 ## 🔧 Features
 - 🔑 **User Authentication**  
-  - Login & Logout (Google OAuth, ID & Password)  
+  - Login & Logout (ID & Password)  
 - 💬 **Multi-comment System**  
   - Users can leave multiple comments per post  
 - 🔍 **Post Search**  
