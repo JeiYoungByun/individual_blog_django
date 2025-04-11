@@ -1,7 +1,7 @@
 # 📝 Individual Blog using Django & Bootstrap
 
 ## 🚀 Stacks
-- **Frontend** : Bootstrap  
+- **Frontend** : CSS, JavaScript 
 - **Backend** : Django
 - **SQL** : PostgreSQL 
 - **Deployment** : Docker, AWS  
